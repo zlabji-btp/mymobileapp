@@ -1,0 +1,5 @@
+{
+    "ModalPage": true,
+    "PageToOpen": "/mymobileapp/Pages/Application/About.page",
+    "_Type": "Action.Type.Navigation"
+}

@@ -1,0 +1,8 @@
+{
+    "mdk.platform": "Web",
+    "mdk.defaultEditor": "MDK Editor",
+    "workbench.editorAssociations": {},
+    "mdk.i18n": {
+        "displayLanguages": "i18n"
+    }
+}

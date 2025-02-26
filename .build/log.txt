@@ -1,0 +1,2 @@
+Pass:
+Generated bundle file /home/user/projects/mymobileapp/.build/mymobileapp/.build/uploadBundle.zip

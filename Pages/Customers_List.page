@@ -18,7 +18,7 @@
 					},
 					"_Type": "Section.Type.ContactCell",
 					"Target": {
-						"Service": "/mymobileapp/Services/com_sap_edm_sampleservice_v4.service",
+						"Service": "/mymobileapp/Services/myapp_mdk_demo.service",
 						"EntitySet": "Customers"
 					},
 					"_Name": "SectionContactCell0",
@@ -28,9 +28,6 @@
 					},
 					"ContactCell": {
 						"Visible": true,
-						"ContextMenu": {
-							"PerformFirstActionWithFullSwipe": true
-						},
 						"DetailImage": "res://contact.png",
 						"Headline": "{FirstName}",
 						"Subheadline": "{LastName}",
@@ -42,7 +39,10 @@
 								"ActivityType": "Email",
 								"ActivityValue": "{EmailAddress}"
 							}
-						]
+						],
+						"ContextMenu": {
+							"PerformFirstActionWithFullSwipe": true
+						}
 					},
 					"DataPaging": {
 						"ShowLoadingIndicator": false,
@@ -60,7 +60,7 @@
 	"_Name": "Customers_List",
 	"ActionBar": {
 		"Items": [],
-		"_Name": "ActionBar2",
+		"_Name": "ActionBar6",
 		"_Type": "Control.Type.ActionBar",
 		"Caption": "Customers"
 	}

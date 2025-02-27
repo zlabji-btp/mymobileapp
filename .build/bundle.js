@@ -89,7 +89,9 @@ let mymobileapp_rules_logging_togglelogging_js = __webpack_require__(/*! ./mymob
 let mymobileapp_rules_logging_tracecategories_js = __webpack_require__(/*! ./mymobileapp/Rules/Logging/TraceCategories.js */ "./build.definitions/mymobileapp/Rules/Logging/TraceCategories.js")
 let mymobileapp_rules_logging_userlogsetting_js = __webpack_require__(/*! ./mymobileapp/Rules/Logging/UserLogSetting.js */ "./build.definitions/mymobileapp/Rules/Logging/UserLogSetting.js")
 let mymobileapp_rules_service_initialize_js = __webpack_require__(/*! ./mymobileapp/Rules/Service/Initialize.js */ "./build.definitions/mymobileapp/Rules/Service/Initialize.js")
+let mymobileapp_services_btp_mymbt_destination_service = __webpack_require__(/*! ./mymobileapp/Services/btp_mymbt_destination.service */ "./build.definitions/mymobileapp/Services/btp_mymbt_destination.service")
 let mymobileapp_services_com_sap_edm_sampleservice_v4_service = __webpack_require__(/*! ./mymobileapp/Services/com_sap_edm_sampleservice_v4.service */ "./build.definitions/mymobileapp/Services/com_sap_edm_sampleservice_v4.service")
+let mymobileapp_services_myapp_mdk_demo_service = __webpack_require__(/*! ./mymobileapp/Services/myapp_mdk_demo.service */ "./build.definitions/mymobileapp/Services/myapp_mdk_demo.service")
 let mymobileapp_styles_styles_css = __webpack_require__(/*! ./mymobileapp/Styles/Styles.css */ "./build.definitions/mymobileapp/Styles/Styles.css")
 let mymobileapp_styles_styles_less = __webpack_require__(/*! ./mymobileapp/Styles/Styles.less */ "./build.definitions/mymobileapp/Styles/Styles.less")
 let mymobileapp_styles_styles_light_css = __webpack_require__(/*! ./mymobileapp/Styles/Styles.light.css */ "./build.definitions/mymobileapp/Styles/Styles.light.css")
@@ -171,7 +173,9 @@ module.exports = {
 	mymobileapp_rules_logging_tracecategories_js : mymobileapp_rules_logging_tracecategories_js,
 	mymobileapp_rules_logging_userlogsetting_js : mymobileapp_rules_logging_userlogsetting_js,
 	mymobileapp_rules_service_initialize_js : mymobileapp_rules_service_initialize_js,
+	mymobileapp_services_btp_mymbt_destination_service : mymobileapp_services_btp_mymbt_destination_service,
 	mymobileapp_services_com_sap_edm_sampleservice_v4_service : mymobileapp_services_com_sap_edm_sampleservice_v4_service,
+	mymobileapp_services_myapp_mdk_demo_service : mymobileapp_services_myapp_mdk_demo_service,
 	mymobileapp_styles_styles_css : mymobileapp_styles_styles_css,
 	mymobileapp_styles_styles_less : mymobileapp_styles_styles_less,
 	mymobileapp_styles_styles_light_css : mymobileapp_styles_styles_light_css,
@@ -199,46 +203,45 @@ __webpack_require__.r(__webpack_exports__);
  * @param {IClientAPI} clientAPI
  */
 function AppUpdateFailure(clientAPI) {
-    let result = clientAPI.actionResults.AppUpdate.error.toString();
-    var message;
-    console.log(result);
-    if (result.startsWith('Error: Uncaught app extraction failure:')) {
-        result = 'Error: Uncaught app extraction failure:';
+  let result = clientAPI.actionResults.AppUpdate.error.toString();
+  var message;
+  console.log(result);
+  if (result.startsWith('Error: Uncaught app extraction failure:')) {
+    result = 'Error: Uncaught app extraction failure:';
+  }
+  if (result.startsWith('Error: LCMS GET Version Response Error Response Status: 404 | Body: 404 Not Found: Requested route')) {
+    result = 'Application instance is not up or running';
+  }
+  if (result.startsWith('Error: LCMS GET Version Response Error Response Status: 404 | Body')) {
+    result = 'Service instance not found.';
+  }
+  switch (result) {
+    case 'Service instance not found.':
+      message = 'Mobile App Update feature is not assigned or not running for your application. Please add the Mobile App Update feature, deploy your application, and try again.';
+      break;
+    case 'Error: LCMS GET Version Response Error Response Status: 404 | Body: Failed to find a matched endpoint':
+      message = 'Mobile App Update feature is not assigned to your application. Please add the Mobile App Update feature, deploy your application, and try again.';
+      break;
+    case 'Error: LCMS GET Version Response failed: Error: Optional(OAuth2Error.tokenRejected: The newly acquired or refreshed token got rejected.)':
+      message = 'The Mobile App Update feature is not assigned to your application or there is no Application metadata deployed. Please check your application in Mobile Services and try again.';
+      break;
+    case 'Error: Uncaught app extraction failure:':
+      message = 'Error extracting metadata. Please redeploy and try again.';
+      break;
+    case 'Application instance is not up or running':
+      message = 'Communication failure. Verify that the BindMobileApplicationRoutesToME Application route is running in your BTP space cockpit.';
+      break;
+    default:
+      message = result;
+      break;
+  }
+  return clientAPI.getPageProxy().executeAction({
+    "Name": "/mymobileapp/Actions/Application/AppUpdateFailureMessage.action",
+    "Properties": {
+      "Duration": 0,
+      "Message": message
     }
-    if (result.startsWith('Error: LCMS GET Version Response Error Response Status: 404 | Body: 404 Not Found: Requested route')) {
-        result = 'Application instance is not up or running';
-    }
-    if (result.startsWith('Error: LCMS GET Version Response Error Response Status: 404 | Body')) {
-        result = 'Service instance not found.';
-    }
-
-    switch (result) {
-        case 'Service instance not found.':
-            message = 'Mobile App Update feature is not assigned or not running for your application. Please add the Mobile App Update feature, deploy your application, and try again.';
-            break;
-        case 'Error: LCMS GET Version Response Error Response Status: 404 | Body: Failed to find a matched endpoint':
-            message = 'Mobile App Update feature is not assigned to your application. Please add the Mobile App Update feature, deploy your application, and try again.';
-            break;
-        case 'Error: LCMS GET Version Response failed: Error: Optional(OAuth2Error.tokenRejected: The newly acquired or refreshed token got rejected.)':
-            message = 'The Mobile App Update feature is not assigned to your application or there is no Application metadata deployed. Please check your application in Mobile Services and try again.';
-            break;
-        case 'Error: Uncaught app extraction failure:':
-            message = 'Error extracting metadata. Please redeploy and try again.';
-            break;
-        case 'Application instance is not up or running':
-            message = 'Communication failure. Verify that the BindMobileApplicationRoutesToME Application route is running in your BTP space cockpit.';
-            break;
-        default:
-            message = result;
-            break;
-    }
-    return clientAPI.getPageProxy().executeAction({
-        "Name": "/mymobileapp/Actions/Application/AppUpdateFailureMessage.action",
-        "Properties": {
-            "Duration": 0,
-            "Message": message
-        }
-    });
+  });
 }
 
 /***/ }),
@@ -259,40 +262,39 @@ __webpack_require__.r(__webpack_exports__);
  * @param {IClientAPI} clientAPI
  */
 function sleep(ms) {
-    return (new Promise(function(resolve, reject) {
-        setTimeout(function() {
-            resolve();
-        }, ms);
-    }));
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      resolve();
+    }, ms);
+  });
 }
 function AppUpdateSuccess(clientAPI) {
-    var message;
-    // Force a small pause to let the progress banner show in case there is no new version available
-    return sleep(500).then(function() {
-        let result = clientAPI.actionResults.AppUpdate.data;
-        console.log(result);
-
-        let versionNum = result.split(': ')[1];
-        if (result.startsWith('Current version is already up to date')) {
-            return clientAPI.getPageProxy().executeAction({
-                "Name": "/mymobileapp/Actions/Application/AppUpdateSuccessMessage.action",
-                "Properties": {
-                    "Message": `You are already using the latest version: ${versionNum}`,
-                    "NumberOfLines": 2
-                }
-            });
-        } else if (result === 'AppUpdate feature is not enabled or no new revision found.') {
-            message = 'No Application metadata found. Please deploy your application and try again.';
-            return clientAPI.getPageProxy().executeAction({
-                "Name": "/mymobileapp/Actions/Application/AppUpdateSuccessMessage.action",
-                "Properties": {
-                    "Duration": 5,
-                    "Message": message,
-                    "NumberOfLines": 2
-                }
-            });
+  var message;
+  // Force a small pause to let the progress banner show in case there is no new version available
+  return sleep(500).then(function () {
+    let result = clientAPI.actionResults.AppUpdate.data;
+    console.log(result);
+    let versionNum = result.split(': ')[1];
+    if (result.startsWith('Current version is already up to date')) {
+      return clientAPI.getPageProxy().executeAction({
+        "Name": "/mymobileapp/Actions/Application/AppUpdateSuccessMessage.action",
+        "Properties": {
+          "Message": `You are already using the latest version: ${versionNum}`,
+          "NumberOfLines": 2
         }
-    });
+      });
+    } else if (result === 'AppUpdate feature is not enabled or no new revision found.') {
+      message = 'No Application metadata found. Please deploy your application and try again.';
+      return clientAPI.getPageProxy().executeAction({
+        "Name": "/mymobileapp/Actions/Application/AppUpdateSuccessMessage.action",
+        "Properties": {
+          "Duration": 5,
+          "Message": message,
+          "NumberOfLines": 2
+        }
+      });
+    }
+  });
 }
 
 /***/ }),
@@ -313,7 +315,7 @@ __webpack_require__.r(__webpack_exports__);
  * @param {IClientAPI} clientAPI
  */
 function ClientIsMultiUserMode(clientAPI) {
-    return clientAPI.isAppInMultiUserMode();
+  return clientAPI.isAppInMultiUserMode();
 }
 
 /***/ }),
@@ -334,17 +336,17 @@ __webpack_require__.r(__webpack_exports__);
  * @param {IClientAPI} clientAPI
  */
 function GetClientSupportVersions(clientAPI) {
-    let versionInfo = clientAPI.getVersionInfo();
-    let versionStr = '';
-    Object.keys(versionInfo).forEach(function(key, index) {
-        // key: the name of the object key
-        // index: the ordinal position of the key within the object
-        //console.log(`Key: ${key}   Index: ${index}`);
-        if (key != 'Application Version') {
-            versionStr += `${key}: ${versionInfo[key]}\n`;
-        }
-    });
-    return versionStr;
+  let versionInfo = clientAPI.getVersionInfo();
+  let versionStr = '';
+  Object.keys(versionInfo).forEach(function (key, index) {
+    // key: the name of the object key
+    // index: the ordinal position of the key within the object
+    //console.log(`Key: ${key}   Index: ${index}`);
+    if (key != 'Application Version') {
+      versionStr += `${key}: ${versionInfo[key]}\n`;
+    }
+  });
+  return versionStr;
 }
 
 /***/ }),
@@ -365,10 +367,10 @@ __webpack_require__.r(__webpack_exports__);
  * @param {IClientAPI} clientAPI
  */
 function GetClientVersion(clientAPI) {
-    let versionInfo = clientAPI.getVersionInfo();
-    if (versionInfo.hasOwnProperty('Application Version')) {
-        return versionInfo['Application Version'];
-    }
+  let versionInfo = clientAPI.getVersionInfo();
+  if (versionInfo.hasOwnProperty('Application Version')) {
+    return versionInfo['Application Version'];
+  }
 }
 
 /***/ }),
@@ -389,15 +391,13 @@ __webpack_require__.r(__webpack_exports__);
  * @param {IClientAPI} clientAPI
  */
 function OnWillUpdate(clientAPI) {
-    return clientAPI.executeAction('/mymobileapp/Actions/Application/OnWillUpdate.action').then((result) => {
-        if (result.data) {
-            return clientAPI.executeAction('/mymobileapp/Actions/com_sap_edm_sampleservice_v4/Service/CloseOffline.action').then(
-                (success) => Promise.resolve(success),
-                (failure) => Promise.reject('Offline Odata Close Failed ' + failure));
-        } else {
-            return Promise.reject('User Deferred');
-        }
-    });
+  return clientAPI.executeAction('/mymobileapp/Actions/Application/OnWillUpdate.action').then(result => {
+    if (result.data) {
+      return clientAPI.executeAction('/mymobileapp/Actions/com_sap_edm_sampleservice_v4/Service/CloseOffline.action').then(success => Promise.resolve(success), failure => Promise.reject('Offline Odata Close Failed ' + failure));
+    } else {
+      return Promise.reject('User Deferred');
+    }
+  });
 }
 
 /***/ }),
@@ -418,28 +418,28 @@ __webpack_require__.r(__webpack_exports__);
  * @param {IClientAPI} clientAPI
  */
 function ResetAppSettingsAndLogout(clientAPI) {
-    let logger = clientAPI.getLogger();
-    let platform = clientAPI.nativescript.platformModule;
-    let appSettings = clientAPI.nativescript.appSettingsModule;
-    var appId;
-    if (platform && (platform.isIOS || platform.isAndroid)) {
-        appId = clientAPI.evaluateTargetPath('#Application/#AppData/MobileServiceAppId');
-    } else {
-        appId = 'WindowsClient';
-    }
-    try {
-        // Remove any other app specific settings
-        appSettings.getAllKeys().forEach(key => {
-            if (key.substring(0, appId.length) === appId) {
-                appSettings.remove(key);
-            }
-        });
-    } catch (err) {
-        logger.log(`ERROR: AppSettings cleanup failure - ${err}`, 'ERROR');
-    } finally {
-        // Logout 
-        return clientAPI.getPageProxy().executeAction('/mymobileapp/Actions/Application/Reset.action');
-    }
+  let logger = clientAPI.getLogger();
+  let platform = clientAPI.nativescript.platformModule;
+  let appSettings = clientAPI.nativescript.appSettingsModule;
+  var appId;
+  if (platform && (platform.isIOS || platform.isAndroid)) {
+    appId = clientAPI.evaluateTargetPath('#Application/#AppData/MobileServiceAppId');
+  } else {
+    appId = 'WindowsClient';
+  }
+  try {
+    // Remove any other app specific settings
+    appSettings.getAllKeys().forEach(key => {
+      if (key.substring(0, appId.length) === appId) {
+        appSettings.remove(key);
+      }
+    });
+  } catch (err) {
+    logger.log(`ERROR: AppSettings cleanup failure - ${err}`, 'ERROR');
+  } finally {
+    // Logout 
+    return clientAPI.getPageProxy().executeAction('/mymobileapp/Actions/Application/Reset.action');
+  }
 }
 
 /***/ }),
@@ -456,28 +456,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ LogLevels)
 /* harmony export */ });
 function LogLevels(clientAPI) {
-    var levels = [];
-    levels.push({
-        'DisplayValue': 'Error',
-        'ReturnValue': 'Error',
-    });
-    levels.push({
-        'DisplayValue': 'Warning',
-        'ReturnValue': 'Warn',
-    });
-    levels.push({
-        'DisplayValue': 'Info',
-        'ReturnValue': 'Info',
-    });
-    levels.push({
-        'DisplayValue': 'Debug',
-        'ReturnValue': 'Debug',
-    });
-    levels.push({
-        'DisplayValue': 'Trace',
-        'ReturnValue': 'Trace',
-    });
-    return levels;
+  var levels = [];
+  levels.push({
+    'DisplayValue': 'Error',
+    'ReturnValue': 'Error'
+  });
+  levels.push({
+    'DisplayValue': 'Warning',
+    'ReturnValue': 'Warn'
+  });
+  levels.push({
+    'DisplayValue': 'Info',
+    'ReturnValue': 'Info'
+  });
+  levels.push({
+    'DisplayValue': 'Debug',
+    'ReturnValue': 'Debug'
+  });
+  levels.push({
+    'DisplayValue': 'Trace',
+    'ReturnValue': 'Trace'
+  });
+  return levels;
 }
 
 /***/ }),
@@ -494,28 +494,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ SetTraceCategories)
 /* harmony export */ });
 function SetTraceCategories(clientAPI) {
-    var logger = clientAPI.getLogger();
-    const sectionedTable = clientAPI.getPageProxy().getControl('SectionedTable');
-    const fcsection = sectionedTable.getSection('FormCellSection0');
-    const traceCategory = fcsection.getControl('TracingCategoriesListPicker');
-    const odataTrace = fcsection.getControl('odataTrace');
-
-    try {
-        if (traceCategory.getValue()) {
-            var values = traceCategory.getValue();
-            var categories = [];
-
-            if (values && values.length) {
-                categories = values.map((value) => {
-                    return 'mdk.trace.' + value.ReturnValue;
-                });
-            }
-            clientAPI.setDebugSettings(odataTrace.getValue(), true, categories);
-        }
-    } catch (exception) {
-        logger.log(String(exception), 'Error');
-        return undefined;
+  var logger = clientAPI.getLogger();
+  const sectionedTable = clientAPI.getPageProxy().getControl('SectionedTable');
+  const fcsection = sectionedTable.getSection('FormCellSection0');
+  const traceCategory = fcsection.getControl('TracingCategoriesListPicker');
+  const odataTrace = fcsection.getControl('odataTrace');
+  try {
+    if (traceCategory.getValue()) {
+      var values = traceCategory.getValue();
+      var categories = [];
+      if (values && values.length) {
+        categories = values.map(value => {
+          return 'mdk.trace.' + value.ReturnValue;
+        });
+      }
+      clientAPI.setDebugSettings(odataTrace.getValue(), true, categories);
     }
+  } catch (exception) {
+    logger.log(String(exception), 'Error');
+    return undefined;
+  }
 }
 
 /***/ }),
@@ -532,51 +530,49 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ SetUserLogLevel)
 /* harmony export */ });
 function SetUserLogLevel(clientAPI) {
-    try {
-        if (clientAPI.getValue() && clientAPI.getValue()[0]) {
-            var logger = clientAPI.getLogger();
-            var listPickerValue = clientAPI.getValue()[0].ReturnValue;
-            if (listPickerValue) {
-                switch (listPickerValue) {
-                    case 'Debug':
-                        logger.setLevel('Debug');
-                        ShowTraceOptions(clientAPI, false);
-                        break;
-                    case 'Error':
-                        logger.setLevel('Error');
-                        ShowTraceOptions(clientAPI, false);
-                        break;
-                    case 'Warn':
-                        logger.setLevel('Warn');
-                        ShowTraceOptions(clientAPI, false);
-                        break;
-                    case 'Info':
-                        logger.setLevel('Info');
-                        ShowTraceOptions(clientAPI, false);
-                        break;
-                    case 'Trace':
-                        logger.setLevel('Trace');
-                        ShowTraceOptions(clientAPI, true);
-                        break;
-                    default:
-                        // eslint-disable-next-line no-console
-                        console.log(`unrecognized key ${listPickerValue}`);
-                }
-                return listPickerValue;
-            }
+  try {
+    if (clientAPI.getValue() && clientAPI.getValue()[0]) {
+      var logger = clientAPI.getLogger();
+      var listPickerValue = clientAPI.getValue()[0].ReturnValue;
+      if (listPickerValue) {
+        switch (listPickerValue) {
+          case 'Debug':
+            logger.setLevel('Debug');
+            ShowTraceOptions(clientAPI, false);
+            break;
+          case 'Error':
+            logger.setLevel('Error');
+            ShowTraceOptions(clientAPI, false);
+            break;
+          case 'Warn':
+            logger.setLevel('Warn');
+            ShowTraceOptions(clientAPI, false);
+            break;
+          case 'Info':
+            logger.setLevel('Info');
+            ShowTraceOptions(clientAPI, false);
+            break;
+          case 'Trace':
+            logger.setLevel('Trace');
+            ShowTraceOptions(clientAPI, true);
+            break;
+          default:
+            // eslint-disable-next-line no-console
+            console.log(`unrecognized key ${listPickerValue}`);
         }
-    } catch (exception) {
-        logger.log(String(exception), 'Error');
-        return undefined;
+        return listPickerValue;
+      }
     }
+  } catch (exception) {
+    logger.log(String(exception), 'Error');
+    return undefined;
+  }
 }
-
 function ShowTraceOptions(clientAPI, tracingEnabled) {
-    let categories = clientAPI.getPageProxy().getControl('SectionedTable').getControl('TracingCategoriesListPicker');
-    let odataTrace = clientAPI.getPageProxy().getControl('SectionedTable').getControl('odataTrace');
-
-    categories.setVisible(tracingEnabled);
-    odataTrace.setVisible(tracingEnabled);
+  let categories = clientAPI.getPageProxy().getControl('SectionedTable').getControl('TracingCategoriesListPicker');
+  let odataTrace = clientAPI.getPageProxy().getControl('SectionedTable').getControl('odataTrace');
+  categories.setVisible(tracingEnabled);
+  odataTrace.setVisible(tracingEnabled);
 }
 
 /***/ }),
@@ -593,29 +589,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ ToggleLogging)
 /* harmony export */ });
 function ToggleLogging(clientAPI) {
-    try {
-        var logger = clientAPI.getLogger();
-        const sectionedTable = clientAPI.getPageProxy().getControl('SectionedTable');
-        const fcsection = sectionedTable.getSection('FormCellSection0');
-        const enableLogSwitch = fcsection.getControl('EnableLogSwitch');
-        const logLevelListPicker = fcsection.getControl('LogLevelListPicker');
-        let switchValue = enableLogSwitch.getValue();
-        if (switchValue) {
-            logger.on();
-            logLevelListPicker.setVisible(true);
-            logLevelListPicker.setEditable(true);
-            logLevelListPicker.redraw();
-        } else {
-            logger.off();
-            logLevelListPicker.setEditable(false);
-            logLevelListPicker.setVisible(false);
-            logLevelListPicker.redraw();
-        }
-        return switchValue;
-    } catch (exception) {
-        logger.log(String(exception), 'Error');
-        return undefined;
+  try {
+    var logger = clientAPI.getLogger();
+    const sectionedTable = clientAPI.getPageProxy().getControl('SectionedTable');
+    const fcsection = sectionedTable.getSection('FormCellSection0');
+    const enableLogSwitch = fcsection.getControl('EnableLogSwitch');
+    const logLevelListPicker = fcsection.getControl('LogLevelListPicker');
+    let switchValue = enableLogSwitch.getValue();
+    if (switchValue) {
+      logger.on();
+      logLevelListPicker.setVisible(true);
+      logLevelListPicker.setEditable(true);
+      logLevelListPicker.redraw();
+    } else {
+      logger.off();
+      logLevelListPicker.setEditable(false);
+      logLevelListPicker.setVisible(false);
+      logLevelListPicker.redraw();
     }
+    return switchValue;
+  } catch (exception) {
+    logger.log(String(exception), 'Error');
+    return undefined;
+  }
 }
 
 /***/ }),
@@ -632,20 +628,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ TraceCategories)
 /* harmony export */ });
 function TraceCategories(clientAPI) {
-    var categories = ['action', 'api', 'app', 'binding', 'branding',
-        'core', 'i18n', 'lcms', 'logging', 'odata', 'onboarding', 'profiling', 'push',
-        'restservice', 'settings', 'targetpath', 'ui'
-    ];
-
-    var values = [];
-    categories.forEach((category) => {
-        values.push({
-            'DisplayValue': category,
-            'ReturnValue': category,
-        });
+  var categories = ['action', 'api', 'app', 'binding', 'branding', 'core', 'i18n', 'lcms', 'logging', 'odata', 'onboarding', 'profiling', 'push', 'restservice', 'settings', 'targetpath', 'ui'];
+  var values = [];
+  categories.forEach(category => {
+    values.push({
+      'DisplayValue': category,
+      'ReturnValue': category
     });
-
-    return values;
+  });
+  return values;
 }
 
 /***/ }),
@@ -662,62 +653,59 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ UserLogSetting)
 /* harmony export */ });
 function UserLogSetting(clientAPI) {
+  try {
+    var logger = clientAPI.getLogger();
+    const sectionedTable = clientAPI.getControl('SectionedTable');
+    const fcsection = sectionedTable.getSection('FormCellSection0');
+    const enableLogSwitch = fcsection.getControl('EnableLogSwitch');
+    const logLevelListPicker = fcsection.getControl('LogLevelListPicker');
+    const traceCategory = fcsection.getControl('TracingCategoriesListPicker');
+    const odataTrace = fcsection.getControl('odataTrace');
 
-    try {
-        var logger = clientAPI.getLogger();
-
-        const sectionedTable = clientAPI.getControl('SectionedTable');
-        const fcsection = sectionedTable.getSection('FormCellSection0');
-        const enableLogSwitch = fcsection.getControl('EnableLogSwitch');
-        const logLevelListPicker = fcsection.getControl('LogLevelListPicker');
-        const traceCategory = fcsection.getControl('TracingCategoriesListPicker');
-        const odataTrace = fcsection.getControl('odataTrace');
-
-
-        //Persist the user logging preferences
-        if (logger) {
-            console.log("in logger state");
-            if (logger.isTurnedOn()) {
-                if (enableLogSwitch) {
-                    enableLogSwitch.setValue(true);
-                }
-                if (logLevelListPicker) {
-                    logLevelListPicker.setEditable(true);
-                }
-            } else {
-                if (enableLogSwitch) {
-                    enableLogSwitch.setValue(false);
-                }
-                if (logLevelListPicker) {
-                    logLevelListPicker.setEditable(false);
-                }
-            }
-            var logLevel = logger.getLevel();
-            if (logLevel) {
-                if (logLevelListPicker) {
-                    logLevelListPicker.setValue([logLevel]);
-                }
-            }
-            if (logLevel === 'Trace') {
-                traceCategory.setVisible(true);
-                odataTrace.setVisible(true);
-            }
-
-            //Upon selecting a value in the List picker and clicking the back button 
-            //will enable the onload page rule. This will set the selected value
-            //in the control
-            if (logLevelListPicker.getValue()[0]) {
-                var returnValue = logLevelListPicker.getValue()[0].ReturnValue;
-                if (returnValue) {
-                    logLevelListPicker.setValue([returnValue]);
-                    logger.setLevel(returnValue);
-                }
-            }
+    //Persist the user logging preferences
+    if (logger) {
+      console.log("in logger state");
+      if (logger.isTurnedOn()) {
+        if (enableLogSwitch) {
+          enableLogSwitch.setValue(true);
         }
-    } catch (exception) {
-        // eslint-disable-next-line no-console
-        console.log(String(exception), 'Error User Logger could not be set');
+        if (logLevelListPicker) {
+          logLevelListPicker.setEditable(true);
+        }
+      } else {
+        if (enableLogSwitch) {
+          enableLogSwitch.setValue(false);
+        }
+        if (logLevelListPicker) {
+          logLevelListPicker.setEditable(false);
+        }
+      }
+      var logLevel = logger.getLevel();
+      if (logLevel) {
+        if (logLevelListPicker) {
+          logLevelListPicker.setValue([logLevel]);
+        }
+      }
+      if (logLevel === 'Trace') {
+        traceCategory.setVisible(true);
+        odataTrace.setVisible(true);
+      }
+
+      //Upon selecting a value in the List picker and clicking the back button 
+      //will enable the onload page rule. This will set the selected value
+      //in the control
+      if (logLevelListPicker.getValue()[0]) {
+        var returnValue = logLevelListPicker.getValue()[0].ReturnValue;
+        if (returnValue) {
+          logLevelListPicker.setValue([returnValue]);
+          logger.setLevel(returnValue);
+        }
+      }
     }
+  } catch (exception) {
+    // eslint-disable-next-line no-console
+    console.log(String(exception), 'Error User Logger could not be set');
+  }
 }
 
 /***/ }),
@@ -734,32 +722,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ Initialize)
 /* harmony export */ });
 function Initialize(context) {
+  // Perform pre data initialization task
 
-    // Perform pre data initialization task
+  // Initialize all your Data sources
+  let _com_sap_edm_sampleservice_v4 = context.executeAction('/mymobileapp/Actions/com_sap_edm_sampleservice_v4/Service/InitializeOffline.action');
 
-    // Initialize all your Data sources
-    let _com_sap_edm_sampleservice_v4 = context.executeAction('/mymobileapp/Actions/com_sap_edm_sampleservice_v4/Service/InitializeOffline.action');
+  //You can add more service initialize actions here
 
-    //You can add more service initialize actions here
+  return Promise.all([_com_sap_edm_sampleservice_v4]).then(() => {
+    // After Initializing the DB connections
 
-    return Promise.all([_com_sap_edm_sampleservice_v4]).then(() => {
-        // After Initializing the DB connections
-
-        // Display successful initialization  message to the user
-        return context.executeAction({
-
-            "Name": "/mymobileapp/Actions/GenericToastMessage.action",
-            "Properties": {
-                "Message": "Application Services Initialized",
-                "Animated": true,
-                "Duration": 1,
-                "IsIconHidden": true,
-                "NumberOfLines": 1
-            }
-        });
-    }).catch(() => {
-        return false;
+    // Display successful initialization  message to the user
+    return context.executeAction({
+      "Name": "/mymobileapp/Actions/GenericToastMessage.action",
+      "Properties": {
+        "Message": "Application Services Initialized",
+        "Animated": true,
+        "Duration": 1,
+        "IsIconHidden": true,
+        "NumberOfLines": 1
+      }
     });
+  }).catch(() => {
+    return false;
+  });
 }
 
 /***/ }),
@@ -780,13 +766,13 @@ __webpack_require__.r(__webpack_exports__);
  * @param {IClientAPI} context
  */
 function CheckForSyncError(context) {
-    context.count('/mymobileapp/Services/com_sap_edm_sampleservice_v4.service', 'ErrorArchive', '').then(errorCount => {
-        if (errorCount > 0) {
-            return context.getPageProxy().executeAction('/mymobileapp/Actions/ErrorArchive/ErrorArchive_SyncFailure.action').then(function() {
-                return Promise.reject(false);
-            });
-        }
-    });
+  context.count('/mymobileapp/Services/com_sap_edm_sampleservice_v4.service', 'ErrorArchive', '').then(errorCount => {
+    if (errorCount > 0) {
+      return context.getPageProxy().executeAction('/mymobileapp/Actions/ErrorArchive/ErrorArchive_SyncFailure.action').then(function () {
+        return Promise.reject(false);
+      });
+    }
+  });
 }
 
 /***/ }),
@@ -1081,7 +1067,7 @@ module.exports = {"Controls":[{"_Type":"Control.Type.SectionedTable","_Name":"Se
   \*****************************************************************/
 /***/ ((module) => {
 
-module.exports = {"Controls":[{"FilterFeedbackBar":{"ShowAllFilters":false,"_Type":"Control.Type.FilterFeedbackBar"},"_Type":"Control.Type.SectionedTable","_Name":"SectionedTable0","Sections":[{"Separators":{"TopSectionSeparator":false,"BottomSectionSeparator":true,"HeaderSeparator":true,"FooterSeparator":true,"ControlSeparator":true},"_Type":"Section.Type.ContactCell","Target":{"Service":"/mymobileapp/Services/com_sap_edm_sampleservice_v4.service","EntitySet":"Customers"},"_Name":"SectionContactCell0","Visible":true,"EmptySection":{"FooterVisible":false},"ContactCell":{"Visible":true,"ContextMenu":{"PerformFirstActionWithFullSwipe":true},"DetailImage":"res://contact.png","Headline":"{FirstName}","Subheadline":"{LastName}","Description":"{City}","OnPress":"/mymobileapp/Actions/NavToCustomers_Detail.action","ActivityItems":[{"_Name":"SectionContactCell0ActivityItems1","ActivityType":"Email","ActivityValue":"{EmailAddress}"}]},"DataPaging":{"ShowLoadingIndicator":false,"PageSize":50},"Search":{"Enabled":true,"BarcodeScanner":true}}]}],"_Type":"Page","_Name":"Customers_List","ActionBar":{"Items":[],"_Name":"ActionBar2","_Type":"Control.Type.ActionBar","Caption":"Customers"}}
+module.exports = {"Controls":[{"FilterFeedbackBar":{"ShowAllFilters":false,"_Type":"Control.Type.FilterFeedbackBar"},"_Type":"Control.Type.SectionedTable","_Name":"SectionedTable0","Sections":[{"Separators":{"TopSectionSeparator":false,"BottomSectionSeparator":true,"HeaderSeparator":true,"FooterSeparator":true,"ControlSeparator":true},"_Type":"Section.Type.ContactCell","Target":{"Service":"/mymobileapp/Services/myapp_mdk_demo.service","EntitySet":"Customers"},"_Name":"SectionContactCell0","Visible":true,"EmptySection":{"FooterVisible":false},"ContactCell":{"Visible":true,"DetailImage":"res://contact.png","Headline":"{FirstName}","Subheadline":"{LastName}","Description":"{City}","OnPress":"/mymobileapp/Actions/NavToCustomers_Detail.action","ActivityItems":[{"_Name":"SectionContactCell0ActivityItems1","ActivityType":"Email","ActivityValue":"{EmailAddress}"}],"ContextMenu":{"PerformFirstActionWithFullSwipe":true}},"DataPaging":{"ShowLoadingIndicator":false,"PageSize":50},"Search":{"Enabled":true,"BarcodeScanner":true}}]}],"_Type":"Page","_Name":"Customers_List","ActionBar":{"Items":[],"_Name":"ActionBar6","_Type":"Control.Type.ActionBar","Caption":"Customers"}}
 
 /***/ }),
 
@@ -1575,13 +1561,33 @@ module.exports = {"Value":"1-800-677-7271","_Type":"String"}
 
 /***/ }),
 
+/***/ "./build.definitions/mymobileapp/Services/btp_mymbt_destination.service":
+/*!******************************************************************************!*\
+  !*** ./build.definitions/mymobileapp/Services/btp_mymbt_destination.service ***!
+  \******************************************************************************/
+/***/ ((module) => {
+
+module.exports = {"SourceType":"Mobile","DestinationName":"btp_mymbt_destination","PathSuffix":""}
+
+/***/ }),
+
 /***/ "./build.definitions/mymobileapp/Services/com_sap_edm_sampleservice_v4.service":
 /*!*************************************************************************************!*\
   !*** ./build.definitions/mymobileapp/Services/com_sap_edm_sampleservice_v4.service ***!
   \*************************************************************************************/
 /***/ ((module) => {
 
-module.exports = {"DestinationName":"com.sap.edm.sampleservice.v4","OfflineEnabled":true,"LanguageURLParam":"","OnlineOptions":{},"OfflineOptions":{"StoreParameters":{}},"PathSuffix":"","SourceType":"Mobile","ServiceUrl":""}
+module.exports = {"DestinationName":"com.sap.edm.sampleservice.v4","OfflineEnabled":true,"SourceType":"Mobile"}
+
+/***/ }),
+
+/***/ "./build.definitions/mymobileapp/Services/myapp_mdk_demo.service":
+/*!***********************************************************************!*\
+  !*** ./build.definitions/mymobileapp/Services/myapp_mdk_demo.service ***!
+  \***********************************************************************/
+/***/ ((module) => {
+
+module.exports = {"DestinationName":"myapp.mdk.demo","OfflineEnabled":true,"SourceType":"Mobile"}
 
 /***/ }),
 

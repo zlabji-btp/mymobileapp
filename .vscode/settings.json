@@ -4,5 +4,15 @@
     "workbench.editorAssociations": {},
     "mdk.i18n": {
         "displayLanguages": "i18n"
+    },
+    "breadcrumbs.enabled": true,
+    "mdk.uieditor": {
+        "left": {
+            "visible": true
+        },
+        "right": {
+            "visible": true,
+            "width": 465
+        }
     }
 }
